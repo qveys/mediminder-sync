@@ -2,6 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Medication, MedicationSchedule, MedicationTake } from "./types";
 
 export async function getMedications() {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medications")
     .select("*")
@@ -12,9 +15,12 @@ export async function getMedications() {
 }
 
 export async function createMedication(medication: Pick<Medication, "name" | "dosage">) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medications")
-    .insert([medication])
+    .insert([{ ...medication, user_id: session.session.user.id }])
     .select()
     .single();
 
@@ -23,6 +29,9 @@ export async function createMedication(medication: Pick<Medication, "name" | "do
 }
 
 export async function getMedicationSchedules(medicationId: string) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medication_schedules")
     .select("*")
@@ -34,6 +43,9 @@ export async function getMedicationSchedules(medicationId: string) {
 }
 
 export async function createMedicationSchedule(schedule: Pick<MedicationSchedule, "medication_id" | "time">) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medication_schedules")
     .insert([schedule])
@@ -45,6 +57,9 @@ export async function createMedicationSchedule(schedule: Pick<MedicationSchedule
 }
 
 export async function getMedicationTakes(medicationId: string) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medication_takes")
     .select("*")
@@ -56,6 +71,9 @@ export async function getMedicationTakes(medicationId: string) {
 }
 
 export async function createMedicationTake(take: Pick<MedicationTake, "medication_id" | "scheduled_for">) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) throw new Error("Not authenticated");
+
   const { data, error } = await supabase
     .from("medication_takes")
     .insert([take])
