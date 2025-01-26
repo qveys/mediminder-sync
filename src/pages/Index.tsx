@@ -34,46 +34,21 @@ const medications = [
   },
 ];
 
-const getDayName = (date: Date) => {
-  return new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(date);
-};
-
-const getDateFromDayNumber = (dayNumber: number) => {
+const getDayName = (dayNumber: number) => {
   const date = new Date();
   date.setDate(dayNumber);
-  return date;
-};
-
-const isValidDayInMonth = (dayNumber: number) => {
-  const date = getDateFromDayNumber(dayNumber);
-  const currentMonth = date.getMonth();
-  const nextDate = new Date(date);
-  nextDate.setDate(dayNumber + 1);
-  
-  return nextDate.getMonth() === currentMonth;
+  return new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(date);
 };
 
 const Index = () => {
   const [currentWeekStart, setCurrentWeekStart] = useState(24);
 
   const handlePreviousWeek = () => {
-    const newStart = currentWeekStart - 7;
-    if (newStart >= 1) {
-      setCurrentWeekStart(newStart);
-    }
+    setCurrentWeekStart(prev => prev - 7);
   };
 
   const handleNextWeek = () => {
-    const lastDayOfMonth = new Date(
-      getDateFromDayNumber(currentWeekStart).getFullYear(),
-      getDateFromDayNumber(currentWeekStart).getMonth() + 1,
-      0
-    ).getDate();
-    
-    const newStart = currentWeekStart + 7;
-    if (newStart <= lastDayOfMonth) {
-      setCurrentWeekStart(newStart);
-    }
+    setCurrentWeekStart(prev => prev + 7);
   };
 
   return (
@@ -95,33 +70,25 @@ const Index = () => {
                   <ChevronLeft className="w-5 h-5 text-muted" />
                 </button>
                 <div className="flex justify-between flex-1 px-4">
-                  {Array.from({ length: 7 }).map((_, i) => {
-                    const currentDay = currentWeekStart + i;
-                    const isValidDay = isValidDayInMonth(currentDay);
-                    const currentDate = getDateFromDayNumber(currentDay);
-
-                    if (!isValidDay) return null;
-
-                    return (
-                      <div
-                        key={i}
-                        className="flex flex-col items-center gap-1"
+                  {Array.from({ length: 7 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <span className="text-xs text-muted uppercase">
+                        {getDayName(currentWeekStart + i)}
+                      </span>
+                      <button
+                        className={`px-4 py-2 rounded-full min-w-[3rem] ${
+                          i === 2
+                            ? "bg-accent text-white"
+                            : "bg-secondary/20 text-muted"
+                        }`}
                       >
-                        <span className="text-xs text-muted uppercase">
-                          {getDayName(currentDate)}
-                        </span>
-                        <button
-                          className={`px-4 py-2 rounded-full min-w-[3rem] ${
-                            i === 2
-                              ? "bg-accent text-white"
-                              : "bg-secondary/20 text-muted"
-                          }`}
-                        >
-                          {currentDay}
-                        </button>
-                      </div>
-                    );
-                  })}
+                        {currentWeekStart + i}
+                      </button>
+                    </div>
+                  ))}
                 </div>
                 <button
                   onClick={handleNextWeek}
