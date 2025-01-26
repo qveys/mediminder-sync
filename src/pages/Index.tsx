@@ -42,19 +42,21 @@ const Index = () => {
             <span className="text-sm font-medium text-accent">
               Aujourd'hui, 24 septembre
             </span>
-            <div className="flex gap-2 overflow-x-auto py-2">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <button
-                  key={i}
-                  className={`px-4 py-2 rounded-full min-w-[3rem] ${
-                    i === 2
-                      ? "bg-accent text-white"
-                      : "bg-secondary/20 text-muted"
-                  }`}
-                >
-                  {24 + i}
-                </button>
-              ))}
+            <div className="flex w-screen -mx-4 px-4 overflow-x-auto py-2">
+              <div className="flex w-full justify-between min-w-full">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <button
+                    key={i}
+                    className={`px-4 py-2 rounded-full min-w-[3rem] ${
+                      i === 2
+                        ? "bg-accent text-white"
+                        : "bg-secondary/20 text-muted"
+                    }`}
+                  >
+                    {24 + i}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
           <div className="grid gap-3">
