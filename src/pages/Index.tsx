@@ -1,55 +1,75 @@
 import { Header } from "@/components/Header";
 import { MedicationCard } from "@/components/MedicationCard";
-import { AddMedicationButton } from "@/components/AddMedicationButton";
 
 const medications = [
   {
     id: 1,
-    name: "Aspirine",
-    time: "08:00",
-    dosage: "1 comprimé",
-    taken: false,
-  },
-  {
-    id: 2,
-    name: "Paracétamol",
-    time: "12:00",
-    dosage: "2 comprimés",
+    name: "Albuterol",
+    time: "08:20",
+    dosage: "2 serre, prendre 1",
     taken: true,
   },
   {
+    id: 2,
+    name: "Simvastatin",
+    time: "12:00",
+    dosage: "5 mg, prendre 1 avec repas",
+    taken: false,
+  },
+  {
     id: 3,
-    name: "Vitamine C",
-    time: "20:00",
-    dosage: "1 comprimé",
+    name: "Loratadine",
+    time: "18:30",
+    dosage: "10 mg, prendre 1 avec repas",
+    taken: false,
+  },
+  {
+    id: 4,
+    name: "Montelukast",
+    time: "18:30",
+    dosage: "10 mg, prendre 1 avec repas",
     taken: false,
   },
 ];
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 pt-24">
-        <div className="space-y-3 animate-fade-in">
-          <span className="text-sm font-medium text-muted-foreground">
-            Aujourd'hui
-          </span>
-          <h2 className="text-2xl font-semibold">Vos médicaments</h2>
-        </div>
-        <div className="mt-8 grid gap-4 animate-slide-up">
-          {medications.map((med) => (
-            <MedicationCard
-              key={med.id}
-              name={med.name}
-              time={med.time}
-              dosage={med.dosage}
-              taken={med.taken}
-            />
-          ))}
+        <div className="space-y-6">
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-accent">
+              Aujourd'hui, 24 septembre
+            </span>
+            <div className="flex gap-2 overflow-x-auto py-2">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <button
+                  key={i}
+                  className={`px-4 py-2 rounded-full min-w-[3rem] ${
+                    i === 2
+                      ? "bg-accent text-white"
+                      : "bg-secondary/20 text-muted"
+                  }`}
+                >
+                  {24 + i}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-3">
+            {medications.map((med) => (
+              <MedicationCard
+                key={med.id}
+                name={med.name}
+                time={med.time}
+                dosage={med.dosage}
+                taken={med.taken}
+              />
+            ))}
+          </div>
         </div>
       </main>
-      <AddMedicationButton />
     </div>
   );
 };
