@@ -30,7 +30,7 @@ export const MedicationCard = ({
           </div>
           <div className="flex flex-col items-start">
             <h3 className="font-medium text-base text-foreground">{name}</h3>
-            <p className="text-sm text-muted">{dosage}</p>
+            <p className="text-sm text-muted-foreground">{dosage}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export const MedicationCard = ({
           )}
           <span className="text-sm font-medium text-accent">{time}</span>
           <button className="p-1 hover:bg-secondary/20 rounded-full">
-            <MoreHorizontal className="w-5 h-5 text-muted" />
+            <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
       </div>

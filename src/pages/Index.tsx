@@ -1,40 +1,17 @@
 import { Header } from "@/components/Header";
 import { MedicationCard } from "@/components/MedicationCard";
 import { WeekCalendar } from "@/components/WeekCalendar";
-
-// Sample data - could be moved to a separate file or fetched from an API
-const medications = [
-  {
-    id: 1,
-    name: "Albuterol",
-    time: "08:20",
-    dosage: "2 serre, prendre 1",
-    taken: true,
-  },
-  {
-    id: 2,
-    name: "Simvastatin",
-    time: "12:00",
-    dosage: "5 mg, prendre 1 avec repas",
-    taken: false,
-  },
-  {
-    id: 3,
-    name: "Loratadine",
-    time: "18:30",
-    dosage: "10 mg, prendre 1 avec repas",
-    taken: false,
-  },
-  {
-    id: 4,
-    name: "Montelukast",
-    time: "18:30",
-    dosage: "10 mg, prendre 1 avec repas",
-    taken: false,
-  },
-];
+import { AddMedicationDialog } from "@/components/AddMedicationDialog";
+import { useQuery } from "@tanstack/react-query";
+import { getMedications } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
+  const { data: medications, isLoading } = useQuery({
+    queryKey: ["medications"],
+    queryFn: getMedications,
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -42,18 +19,31 @@ const Index = () => {
         <div className="space-y-6">
           <WeekCalendar initialDate={new Date()} />
           <div className="grid gap-3">
-            {medications.map((med) => (
-              <MedicationCard
-                key={med.id}
-                name={med.name}
-                time={med.time}
-                dosage={med.dosage}
-                taken={med.taken}
-              />
-            ))}
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="w-full h-24">
+                  <Skeleton className="w-full h-full" />
+                </div>
+              ))
+            ) : medications?.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Aucun médicament ajouté pour le moment.
+              </div>
+            ) : (
+              medications?.map((med) => (
+                <MedicationCard
+                  key={med.id}
+                  name={med.name}
+                  time="08:00"
+                  dosage={med.dosage}
+                  taken={false}
+                />
+              ))
+            )}
           </div>
         </div>
       </main>
+      <AddMedicationDialog />
     </div>
   );
 };
