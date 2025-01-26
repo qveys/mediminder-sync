@@ -34,21 +34,50 @@ const medications = [
   },
 ];
 
-const getDayName = (dayNumber: number) => {
-  const date = new Date();
-  date.setDate(dayNumber);
+const getDaysInMonth = (year: number, month: number) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+const getDayName = (date: Date) => {
   return new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(date);
 };
 
 const Index = () => {
-  const [currentWeekStart, setCurrentWeekStart] = useState(24);
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(today);
+  
+  // Get the start of the week (Monday)
+  const getStartOfWeek = (date: Date) => {
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    return new Date(date.setDate(diff));
+  };
+
+  const startOfWeek = getStartOfWeek(new Date(currentDate));
 
   const handlePreviousWeek = () => {
-    setCurrentWeekStart(prev => prev - 7);
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() - 7);
+    setCurrentDate(newDate);
   };
 
   const handleNextWeek = () => {
-    setCurrentWeekStart(prev => prev + 7);
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + 7);
+    setCurrentDate(newDate);
+  };
+
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(startOfWeek);
+    date.setDate(startOfWeek.getDate() + i);
+    return date;
+  });
+
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
   };
 
   return (
@@ -58,7 +87,7 @@ const Index = () => {
         <div className="space-y-6">
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium text-accent">
-              Aujourd'hui, 24 septembre
+              Aujourd'hui, {today.getDate()} {new Intl.DateTimeFormat('fr-FR', { month: 'long' }).format(today)}
             </span>
             <div className="flex w-screen -mx-4 px-4 overflow-x-auto py-2">
               <div className="flex w-full items-center justify-between min-w-full px-4">
@@ -70,22 +99,22 @@ const Index = () => {
                   <ChevronLeft className="w-5 h-5 text-muted" />
                 </button>
                 <div className="flex justify-between flex-1 px-4">
-                  {Array.from({ length: 7 }).map((_, i) => (
+                  {weekDays.map((date, i) => (
                     <div
                       key={i}
                       className="flex flex-col items-center gap-1"
                     >
                       <span className="text-xs text-muted uppercase">
-                        {getDayName(currentWeekStart + i)}
+                        {getDayName(date)}
                       </span>
                       <button
                         className={`px-4 py-2 rounded-full min-w-[3rem] ${
-                          i === 2
+                          isToday(date)
                             ? "bg-accent text-white"
                             : "bg-secondary/20 text-muted"
                         }`}
                       >
-                        {currentWeekStart + i}
+                        {date.getDate()}
                       </button>
                     </div>
                   ))}
