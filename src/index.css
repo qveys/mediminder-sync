@@ -58,6 +58,18 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
   }
+
+  /* Styles spécifiques pour le formulaire d'ajout de médicament */
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    background: none;
+    display: none;
+  }
+
+  input[type="time"] {
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+  }
 }
 
 @layer components {
