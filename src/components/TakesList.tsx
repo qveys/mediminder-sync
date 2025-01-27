@@ -39,35 +39,45 @@ export const TakesList: React.FC<TakesListProps> = ({selectedDate}) => {
     const getMedicationById = (id: string) => medications?.find((med) => med.id === id);
 
     if (isLoading) {
-        return Array.from({length: 3}).map((_, i) => (
-            <div key={i} className="w-full h-24">
-                <Skeleton className="w-full h-full"/>
+        return (
+            <div className="h-full flex flex-col justify-center">
+                {Array.from({length: 3}).map((_, i) => (
+                    <div key={i} className="w-full h-24 mb-3">
+                        <Skeleton className="w-full h-full"/>
+                    </div>
+                ))}
             </div>
-        ));
+        );
     }
 
     if (!takes?.length) {
-        return <div className="text-center py-8 text-muted-foreground">
-            Aucun médicament prévu pour le {format(selectedDate, "d MMMM yyyy", {locale: fr})}.
-        </div>;
+        return (
+            <div className="h-full flex items-center justify-center">
+                <div className="text-center text-muted-foreground">
+                    Aucun médicament prévu pour le {format(selectedDate, "d MMMM yyyy", {locale: fr})}.
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div className="grid gap-3">
-            {takes.map((take) => {
-                const medication = getMedicationById(take.medication_id);
-                if (!medication) return null;
+        <div className="h-full p-4 overflow-y-auto">
+            <div className="grid gap-3">
+                {takes.map((take) => {
+                    const medication = getMedicationById(take.medication_id);
+                    if (!medication) return null;
 
-                return (
-                    <MedicationCard
-                        key={take.id}
-                        name={medication.name}
-                        time={format(new Date(take.scheduled_for), "HH:mm")}
-                        dosage={medication.dosage}
-                        taken={!!take.taken_at}
-                    />
-                );
-            })}
+                    return (
+                        <MedicationCard
+                            key={take.id}
+                            name={medication.name}
+                            time={format(new Date(take.scheduled_for), "HH:mm")}
+                            dosage={medication.dosage}
+                            taken={!!take.taken_at}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 };

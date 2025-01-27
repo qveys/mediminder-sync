@@ -1,4 +1,7 @@
-import React, {useRef, useState} from "react";
+import React, { useEffect, useRef } from 'react';
+import { tns } from "tiny-slider";
+import "tiny-slider/dist/tiny-slider.css";
+import { addDays, subDays } from 'date-fns';
 
 interface DateHandlerContainerProps {
     children: React.ReactNode;
@@ -6,65 +9,52 @@ interface DateHandlerContainerProps {
     onDateChange: (date: Date) => void;
 }
 
-export const DateHandlerContainer: React.FC<DateHandlerContainerProps> = ({children, selectedDate, onDateChange}) => {
-    const touchStartX = useRef<number | null>(null);
-    const touchEndX = useRef<number | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [isAnimating, setIsAnimating] = useState(false);
+export const DateHandlerContainer = ({ children, selectedDate, onDateChange }: DateHandlerContainerProps) => {
+    const sliderRef = useRef<HTMLDivElement>(null);
+    const sliderInstance = useRef<any>(null);
 
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
+    useEffect(() => {
+        if (sliderRef.current) {
+            sliderInstance.current = tns({
+                container: sliderRef.current,
+                items: 1,
+                slideBy: 1,
+                speed: 300,
+                nav: false,
+                controls: false,
+                mouseDrag: true,
+                touch: true,
+                autoplay: false,
+                autoHeight: true,
+                preventScrollOnTouch: 'auto'
+            });
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-        if (!touchStartX.current || isAnimating) return;
-        const currentX = e.touches[0].clientX;
-        const diff = touchStartX.current - currentX;
-
-        if (containerRef.current) {
-            containerRef.current.style.transform = `translateX(${-diff}px)`;
+            sliderInstance.current.events.on('transitionEnd', () => {
+                const info = sliderInstance.current.getInfo();
+                const direction = info.indexCached < info.index ? 'next' : 'prev';
+                
+                if (direction === 'next') {
+                    onDateChange(addDays(selectedDate, 1));
+                } else {
+                    onDateChange(subDays(selectedDate, 1));
+                }
+            });
         }
-    };
 
-    const handleTouchEnd = (e: React.TouchEvent) => {
-        if (!touchStartX.current || isAnimating) return;
-
-        touchEndX.current = e.changedTouches[0].clientX;
-        const diff = touchStartX.current - touchEndX.current;
-
-        if (Math.abs(diff) > 100) {
-            setIsAnimating(true);
-            const newDate = new Date(selectedDate);
-
-            if (diff > 0) {
-                newDate.setDate(selectedDate.getDate() + 1);
-            } else {
-                newDate.setDate(selectedDate.getDate() - 1);
+        return () => {
+            if (sliderInstance.current) {
+                sliderInstance.current.destroy();
             }
-
-            onDateChange(newDate);
-
-            setTimeout(() => {
-                setIsAnimating(false);
-                if (containerRef.current) containerRef.current.style.transform = "";
-            }, 300);
-        } else {
-            if (containerRef.current) containerRef.current.style.transform = "";
-        }
-
-        touchStartX.current = null;
-        touchEndX.current = null;
-    };
+        };
+    }, []);
 
     return (
-        <div
-            className="overflow-hidden"
-            ref={containerRef}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-        >
-            {children}
+        <div className="relative overflow-hidden">
+            <div ref={sliderRef} className="h-[calc(100vh-16rem)]">
+                <div className="h-full">
+                    {children}
+                </div>
+            </div>
         </div>
     );
 };
