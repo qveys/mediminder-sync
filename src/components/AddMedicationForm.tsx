@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Progress } from "./ui/progress";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -66,10 +66,38 @@ export const AddMedicationForm = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Add authentication check
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Non authentifié",
+          description: "Veuillez vous connecter pour ajouter un médicament",
+          variant: "destructive",
+        });
+        navigate("/auth");
+      }
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth");
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
+
   const createMedicationMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user) throw new Error("Not authenticated");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error("Not authenticated");
 
       // Insert medication
       const { data: medication, error: medicationError } = await supabase
@@ -78,7 +106,7 @@ export const AddMedicationForm = () => {
           {
             name: data.name,
             dosage: data.dosage,
-            user_id: session.session.user.id,
+            user_id: session.user.id,
           },
         ])
         .select()
