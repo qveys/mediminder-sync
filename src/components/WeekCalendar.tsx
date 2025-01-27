@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { WeekDay } from "./WeekDay";
 import { getStartOfWeek, formatMonthName, isToday } from "@/lib/dateUtils";
+import { Button } from "./ui/button";
 
 interface WeekCalendarProps {
   initialDate?: Date;
@@ -33,6 +34,13 @@ export const WeekCalendar = ({
     onDateSelect?.(date);
   };
 
+  const handleTodayClick = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    setSelectedDate(today);
+    onDateSelect?.(today);
+  };
+
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
@@ -41,9 +49,18 @@ export const WeekCalendar = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-accent">
-        Aujourd'hui, {initialDate.getDate()} {formatMonthName(initialDate)}
-      </span>
+      <div className="flex items-center justify-between px-4">
+        <Button 
+          variant="ghost" 
+          className="text-sm font-medium text-accent hover:text-accent/80"
+          onClick={handleTodayClick}
+        >
+          &lt;&lt; Aujourd'hui
+        </Button>
+        <span className="text-sm font-medium text-accent">
+          Aujourd'hui, {initialDate.getDate()} {formatMonthName(initialDate)}
+        </span>
+      </div>
       <div className="flex w-screen -mx-4 px-4 overflow-x-auto py-2">
         <div className="flex w-full items-center justify-between min-w-full px-4">
           <button
