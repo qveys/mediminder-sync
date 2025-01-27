@@ -67,16 +67,16 @@ export const WeekCalendar = ({
           </div>
         )}
       </div>
-      <div className="flex w-screen -mx-4 px-4 overflow-x-auto py-2">
-        <div className="flex w-full items-center justify-between min-w-full px-4">
+      <div className="flex overflow-hidden px-2">
+        <div className="flex items-center justify-between w-full">
           <button
             onClick={handlePreviousWeek}
-            className="p-2 rounded-full hover:bg-secondary/20"
+            className="p-2 rounded-full hover:bg-secondary/20 flex-shrink-0"
             aria-label="Semaine précédente"
           >
             <ChevronLeft className="w-5 h-5 text-muted" />
           </button>
-          <div className="flex justify-between flex-1 px-4">
+          <div className="flex justify-between flex-1 px-2">
             {weekDays.map((date, i) => (
               <WeekDay 
                 key={i} 
@@ -91,7 +91,7 @@ export const WeekCalendar = ({
           </div>
           <button
             onClick={handleNextWeek}
-            className="p-2 rounded-full hover:bg-secondary/20"
+            className="p-2 rounded-full hover:bg-secondary/20 flex-shrink-0"
             aria-label="Semaine suivante"
           >
             <ChevronRight className="w-5 h-5 text-muted" />
