@@ -47,21 +47,25 @@ export const WeekCalendar = ({
     return date;
   });
 
+  const isTodaySelected = isToday(selectedDate);
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center px-4 relative">
         <span className="text-sm font-medium text-accent absolute left-1/2 -translate-x-1/2">
-          Aujourd'hui, {initialDate.getDate()} {formatMonthName(initialDate)}
+          {isTodaySelected ? "Aujourd'hui, " : ""}{initialDate.getDate()} {formatMonthName(initialDate)}
         </span>
-        <div className="ml-auto">
-          <Button 
-            variant="ghost" 
-            className="text-sm font-medium text-accent hover:text-accent/80"
-            onClick={handleTodayClick}
-          >
-            &lt;&lt; Aujourd'hui
-          </Button>
-        </div>
+        {!isTodaySelected && (
+          <div className="ml-auto">
+            <Button 
+              variant="ghost" 
+              className="text-sm font-medium text-accent hover:text-accent/80"
+              onClick={handleTodayClick}
+            >
+              &lt;&lt; Aujourd'hui
+            </Button>
+          </div>
+        )}
       </div>
       <div className="flex w-screen -mx-4 px-4 overflow-x-auto py-2">
         <div className="flex w-full items-center justify-between min-w-full px-4">
