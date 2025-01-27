@@ -67,14 +67,9 @@ const Index = () => {
     return medications?.find(med => med.id === id);
   };
 
-  const handleDateSelect = (date: Date) => {
-    setSlideDirection(date > selectedDate ? 'right' : 'left');
+  const handleDateSelect = (date: Date, isPrevious: boolean) => {
+    setSlideDirection(isPrevious ? 'right' : 'left');
     setSelectedDate(date);
-  };
-
-  const getSlideAnimation = () => {
-    if (!slideDirection) return '';
-    return slideDirection === 'left' ? 'animate-slide-from-left' : 'animate-slide-from-right';
   };
 
   return (
@@ -87,8 +82,11 @@ const Index = () => {
             onDateSelect={handleDateSelect}
           />
           <div 
-            key={selectedDate.toISOString()} 
-            className={`grid gap-3 ${getSlideAnimation()}`}
+            key={selectedDate.toISOString()}
+            className={`grid gap-3 ${
+              slideDirection === 'left' ? 'animate-slide-left' : 
+              slideDirection === 'right' ? 'animate-slide-right' : ''
+            }`}
           >
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
