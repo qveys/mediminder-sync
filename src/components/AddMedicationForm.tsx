@@ -5,6 +5,10 @@ import { Input } from "./ui/input";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { ChevronLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./ui/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type FormData = {
   name: string;
@@ -58,9 +62,83 @@ export const AddMedicationForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const { register, handleSubmit, watch, setValue } = useForm<FormData>();
   const progress = ((currentStep + 1) / STEPS.length) * 100;
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createMedicationMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.user) throw new Error("Not authenticated");
+
+      // Insert medication
+      const { data: medication, error: medicationError } = await supabase
+        .from("medications")
+        .insert([
+          {
+            name: data.name,
+            dosage: data.dosage,
+            user_id: session.session.user.id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (medicationError) throw medicationError;
+      if (!medication) throw new Error("No medication created");
+
+      // Create schedules based on frequency
+      const frequency = parseInt(data.frequency);
+      if (!isNaN(frequency)) {
+        const [hours, minutes] = data.time.split(":");
+        const baseTime = new Date();
+        baseTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+        const schedules = [];
+        for (let i = 0; i < frequency; i++) {
+          const scheduleTime = new Date(baseTime);
+          if (frequency > 1) {
+            scheduleTime.setHours(baseTime.getHours() + (24 / frequency) * i);
+          }
+          schedules.push({
+            medication_id: medication.id,
+            time: scheduleTime.toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          });
+        }
+
+        const { error: schedulesError } = await supabase
+          .from("medication_schedules")
+          .insert(schedules);
+
+        if (schedulesError) throw schedulesError;
+      }
+
+      return medication;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["medications"] });
+      toast({
+        title: "Médicament ajouté",
+        description: "Votre médicament a été ajouté avec succès",
+      });
+      navigate("/");
+    },
+    onError: (error) => {
+      console.error("Error creating medication:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'ajout du médicament",
+        variant: "destructive",
+      });
+    },
+  });
 
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    createMedicationMutation.mutate(data);
   };
 
   const currentStepData = STEPS[currentStep];
@@ -69,6 +147,8 @@ export const AddMedicationForm = () => {
   const goToNextStep = () => {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit(onSubmit)();
     }
   };
 
@@ -165,10 +245,14 @@ export const AddMedicationForm = () => {
         <Button
           type="button"
           onClick={goToNextStep}
-          disabled={!canGoNext}
+          disabled={!canGoNext || createMedicationMutation.isPending}
           className="w-full bg-[#0284C7] hover:bg-[#0284C7]/90 text-white p-6 rounded-full text-lg"
         >
-          {currentStep === STEPS.length - 1 ? "Enregistrer" : "Suivant"}
+          {createMedicationMutation.isPending
+            ? "Enregistrement..."
+            : currentStep === STEPS.length - 1
+            ? "Enregistrer"
+            : "Suivant"}
         </Button>
       </form>
     </div>
