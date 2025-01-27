@@ -5,13 +5,17 @@ import { getStartOfWeek, formatMonthName, isToday } from "@/lib/dateUtils";
 
 interface WeekCalendarProps {
   initialDate?: Date;
+  onDateSelect?: (date: Date) => void;
 }
 
-export const WeekCalendar = ({ initialDate = new Date() }: WeekCalendarProps) => {
+export const WeekCalendar = ({ 
+  initialDate = new Date(2025, 0, 27), 
+  onDateSelect 
+}: WeekCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
+  const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
   const startOfWeek = getStartOfWeek(new Date(currentDate));
 
-  // Navigation handlers
   const handlePreviousWeek = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() - 7);
@@ -24,7 +28,11 @@ export const WeekCalendar = ({ initialDate = new Date() }: WeekCalendarProps) =>
     setCurrentDate(newDate);
   };
 
-  // Generate array of dates for the week
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    onDateSelect?.(date);
+  };
+
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
@@ -47,7 +55,15 @@ export const WeekCalendar = ({ initialDate = new Date() }: WeekCalendarProps) =>
           </button>
           <div className="flex justify-between flex-1 px-4">
             {weekDays.map((date, i) => (
-              <WeekDay key={i} date={date} isActive={isToday(date)} />
+              <WeekDay 
+                key={i} 
+                date={date} 
+                isActive={isToday(date)}
+                isSelected={selectedDate.getDate() === date.getDate() && 
+                           selectedDate.getMonth() === date.getMonth() && 
+                           selectedDate.getFullYear() === date.getFullYear()}
+                onClick={() => handleDateSelect(date)}
+              />
             ))}
           </div>
           <button
