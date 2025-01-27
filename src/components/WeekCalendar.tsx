@@ -7,7 +7,7 @@ interface WeekCalendarProps {
   initialDate?: Date;
 }
 
-export const WeekCalendar = ({ initialDate = new Date() }: WeekCalendarProps) => {
+export const WeekCalendar = ({ initialDate = new Date(2025, 0, 27) }: WeekCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
   const startOfWeek = getStartOfWeek(new Date(currentDate));
 
