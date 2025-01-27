@@ -51,7 +51,7 @@ export const WeekCalendar = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center px-4 relative">
+      <div className="flex items-center px-4 relative h-10">
         <span className="text-sm font-medium text-accent absolute left-1/2 -translate-x-1/2">
           {isTodaySelected ? "Aujourd'hui, " : ""}{initialDate.getDate()} {formatMonthName(initialDate)}
         </span>
