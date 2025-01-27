@@ -13,7 +13,7 @@ export const WeekDay = ({ date, isActive, isSelected, onClick }: WeekDayProps) =
       className="flex flex-col items-center gap-1 cursor-pointer" 
       onClick={onClick}
     >
-      <span className={`text-xs uppercase ${isActive ? 'text-accent' : 'text-muted'}`}>
+      <span className={`text-xs uppercase ${isActive && 'text-accent'}`}>
         {getDayName(date)}
       </span>
       <button
@@ -22,7 +22,7 @@ export const WeekDay = ({ date, isActive, isSelected, onClick }: WeekDayProps) =
             ? "bg-accent text-white"
             : isActive
             ? "bg-accent/20 text-accent"
-            : "bg-secondary/20 text-muted"
+                  : "bg-secondary/20"
         }`}
       >
         {date.getDate()}
