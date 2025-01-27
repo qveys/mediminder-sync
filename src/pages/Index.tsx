@@ -14,7 +14,6 @@ import { fr } from "date-fns/locale";
 const Index = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date(2025, 0, 27));
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -67,8 +66,7 @@ const Index = () => {
     return medications?.find(med => med.id === id);
   };
 
-  const handleDateSelect = (date: Date, isPrevious: boolean) => {
-    setSlideDirection(isPrevious ? 'right' : 'left');
+  const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
   };
 
@@ -81,13 +79,7 @@ const Index = () => {
             initialDate={selectedDate} 
             onDateSelect={handleDateSelect}
           />
-          <div 
-            key={selectedDate.toISOString()}
-            className={`grid gap-3 ${
-              slideDirection === 'left' ? 'animate-slide-left' : 
-              slideDirection === 'right' ? 'animate-slide-right' : ''
-            }`}
-          >
+          <div className="grid gap-3">
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="w-full h-24">
