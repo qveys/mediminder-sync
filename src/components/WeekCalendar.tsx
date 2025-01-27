@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 
 interface WeekCalendarProps {
   initialDate?: Date;
-  onDateSelect?: (date: Date) => void;
+  onDateSelect?: (date: Date, isPrevious: boolean) => void;
 }
 
 export const WeekCalendar = ({ 
@@ -30,15 +30,17 @@ export const WeekCalendar = ({
   };
 
   const handleDateSelect = (date: Date) => {
+    const isPrevious = date < selectedDate;
     setSelectedDate(date);
-    onDateSelect?.(date);
+    onDateSelect?.(date, isPrevious);
   };
 
   const handleTodayClick = () => {
     const today = new Date();
+    const isPrevious = today < selectedDate;
     setCurrentDate(today);
     setSelectedDate(today);
-    onDateSelect?.(today);
+    onDateSelect?.(today, isPrevious);
   };
 
   const weekDays = Array.from({ length: 7 }, (_, i) => {
